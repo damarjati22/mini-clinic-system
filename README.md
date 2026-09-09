@@ -1,4 +1,3 @@
-﻿# Mini Clinic System
 # Mini Clinic System
 
 Sistem Informasi Manajemen Klinik Pratama (Mini Clinic System) berbasis *Fullstack Web Application* (React Vite & Node.js/Express) yang dirancang untuk mengelola data pasien, pendaftaran kunjungan, antrean *real-time*, rekam medis elektronik (SOAP), dan manajemen resep obat.
