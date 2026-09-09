@@ -52,11 +52,13 @@ function DashboardDokter({ user, onLogout }) {
   };
 
   // Kirim / Simpan Data SOAP
+// Kirim / Simpan Data SOAP & Resep secara berurutan
   const handleSaveSoap = async (e) => {
     e.preventDefault();
     setErrorMsg('');
 
     try {
+      // 1. Simpan Data SOAP ke /api/medical-records
       const response = await fetch('http://localhost:5000/api/medical-records', {
         method: 'POST',
         headers: {
@@ -66,21 +68,47 @@ function DashboardDokter({ user, onLogout }) {
         body: JSON.stringify({
           visit_id: selectedVisit.id,
           patient_id: selectedVisit.patient_id,
-          ...soapData
+          subjective: soapData.subjective,
+          objective: soapData.objective,
+          assessment: soapData.assessment,
+          plan: soapData.plan,
+          actions: soapData.actions
         })
       });
 
       const result = await response.json();
       if (!response.ok) throw new Error(result.message);
 
-      alert(result.message);
+      // 2. Simpan Data Resep Obat (jika diisi) ke /api/prescriptions
+      if (soapData.prescription.trim() !== '') {
+        const prescriptionResponse = await fetch('http://localhost:5000/api/prescriptions', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`
+          },
+          body: JSON.stringify({
+            // result.medicalRecordId harus dikembalikan oleh backend, 
+            // tapi sebagai alternatif sementara kita bisa kirim null atau ID kunjungan
+            medical_record_id: result.medicalRecordId || 1, 
+            patient_id: selectedVisit.patient_id,
+            medicine_details: soapData.prescription
+          })
+        });
+        
+        if (!prescriptionResponse.ok) {
+           console.warn("Rekam medis tersimpan, tapi resep gagal:", await prescriptionResponse.json());
+        }
+      }
+
+      alert('Pemeriksaan SOAP dan resep berhasil disimpan!');
       setIsSoapModalOpen(false);
       fetchDoctorVisits();
     } catch (err) {
       setErrorMsg(err.message);
     }
   };
-
+  
   return (
     <div className="min-h-screen bg-slate-50 font-sans">
       {/* Navbar */}

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 
-function VisitManagement({ onBack, user }) {
+function VisitManagement() {
   const [visits, setVisits] = useState([]);
   const [patients, setPatients] = useState([]);
   const [doctors, setDoctors] = useState([]);
@@ -100,92 +100,84 @@ function VisitManagement({ onBack, user }) {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 p-6 font-sans">
-      <div className="max-w-6xl mx-auto space-y-6">
-        
-        {/* Header Bar */}
-        <div className="flex justify-between items-center bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
-          <div className="flex items-center space-x-3">
-            {onBack && (
-              <button onClick={onBack} className="text-slate-400 hover:text-slate-600 font-medium text-sm flex items-center space-x-1">
-                <span>← Kembali</span>
-              </button>
-            )}
-            <h1 className="text-2xl font-bold text-slate-800">Pendaftaran Kunjungan Pasien</h1>
-          </div>
-          <button
-            onClick={() => setIsModalOpen(true)}
-            className="bg-blue-600 hover:bg-blue-700 text-white font-medium px-4 py-2.5 rounded-xl shadow-md transition text-sm flex items-center space-x-2"
-          >
-            <span>+ Daftarkan Kunjungan Baru</span>
-          </button>
+    <div className="space-y-6 font-sans">
+      {/* Header Bar */}
+      <div className="flex justify-between items-center bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+        <div>
+          <h1 className="text-2xl font-bold text-slate-800">Pendaftaran Kunjungan Pasien</h1>
+          <p className="text-xs text-slate-500 mt-1">Kelola antrean poli dan pendaftaran harian pasien.</p>
         </div>
+        <button
+          onClick={() => setIsModalOpen(true)}
+          className="bg-blue-600 hover:bg-blue-700 text-white font-medium px-4 py-2.5 rounded-xl shadow-md transition text-sm flex items-center space-x-2"
+        >
+          <span>+ Daftarkan Kunjungan Baru</span>
+        </button>
+      </div>
 
-        {/* Tabel Data Kunjungan */}
-        <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse">
-              <thead>
-                <tr className="bg-slate-50 border-b border-slate-100 text-xs font-semibold text-slate-500 uppercase tracking-wider">
-                  <th className="p-4 text-center">No. Antrean</th> {/* <-- Kolom No Antrean */}
-                  <th className="p-4">No. RM & Pasien</th>
-                  <th className="p-4">Poli & Dokter Tujuan</th>
-                  <th className="p-4">Tanggal & Pembayaran</th>
-                  <th className="p-4">Keluhan Awal</th>
-                  <th className="p-4 text-center">Status Antrean</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-100 text-sm text-slate-700">
-                {loading ? (
-                  <tr><td colSpan="6" className="text-center py-8 text-slate-400">Memuat data...</td></tr>
-                ) : visits.length === 0 ? (
-                  <tr><td colSpan="6" className="text-center py-8 text-slate-400">Belum ada kunjungan pasien terdaftar.</td></tr>
-                ) : (
-                  visits.map((v) => (
-                    <tr key={v.id} className="hover:bg-slate-50/50 transition">
-                      <td className="p-4 text-center">
-                        <span className="inline-block px-3 py-1 bg-blue-50 text-blue-700 font-extrabold text-sm rounded-lg border border-blue-100">
-                          {v.queue_number || '-'}
-                        </span>
-                      </td>
-                      <td className="p-4">
-                        <span className="font-semibold text-blue-600 block">{v.no_rm}</span>
-                        <span className="text-slate-900 font-medium">{v.patient_name}</span>
-                      </td>
-                      <td className="p-4">
-                        <span className="font-semibold text-slate-800 block">{v.poli}</span>
-                        <span className="text-xs text-slate-500">Dr. {v.doctor_name}</span>
-                      </td>
-                      <td className="p-4">
-                        <span className="block">{v.visit_date ? v.visit_date.split('T')[0] : '-'}</span>
-                        <span className="inline-block mt-1 px-2 py-0.5 text-xs bg-slate-100 text-slate-600 rounded-md font-medium">{v.payment_type}</span>
-                      </td>
-                      <td className="p-4 max-w-xs truncate text-slate-600">{v.initial_complaint}</td>
-                      <td className="p-4 text-center">
-                        <select
-                          value={v.status}
-                          onChange={(e) => handleStatusChange(v.id, e.target.value)}
-                          className={`px-3 py-1.5 rounded-xl text-xs font-semibold border focus:ring-2 focus:ring-blue-500 ${
-                            v.status === 'Menunggu' ? 'bg-amber-50 text-amber-700 border-amber-200' :
-                            v.status === 'Check In' ? 'bg-blue-50 text-blue-700 border-blue-200' :
-                            v.status === 'Pemeriksaan' ? 'bg-purple-50 text-purple-700 border-purple-200' :
-                            'bg-emerald-50 text-emerald-700 border-emerald-200'
-                          }`}
-                        >
-                          <option value="Menunggu">Menunggu</option>
-                          <option value="Check In">Check In</option>
-                          <option value="Pemeriksaan">Pemeriksaan</option>
-                          <option value="Selesai">Selesai</option>
-                        </select>
-                      </td>
-                    </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
-          </div>
+      {/* Tabel Data Kunjungan */}
+      <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="w-full text-left border-collapse">
+            <thead>
+              <tr className="bg-slate-50 border-b border-slate-100 text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                <th className="p-4 text-center">No. Antrean</th>
+                <th className="p-4">No. RM & Pasien</th>
+                <th className="p-4">Poli & Dokter Tujuan</th>
+                <th className="p-4">Tanggal & Pembayaran</th>
+                <th className="p-4">Keluhan Awal</th>
+                <th className="p-4 text-center">Status Antrean</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-100 text-sm text-slate-700">
+              {loading ? (
+                <tr><td colSpan="6" className="text-center py-8 text-slate-400">Memuat data...</td></tr>
+              ) : visits.length === 0 ? (
+                <tr><td colSpan="6" className="text-center py-8 text-slate-400">Belum ada kunjungan pasien terdaftar.</td></tr>
+              ) : (
+                visits.map((v) => (
+                  <tr key={v.id} className="hover:bg-slate-50/50 transition">
+                    <td className="p-4 text-center">
+                      <span className="inline-block px-3 py-1 bg-blue-50 text-blue-700 font-extrabold text-sm rounded-lg border border-blue-100">
+                        {v.queue_number || '-'}
+                      </span>
+                    </td>
+                    <td className="p-4">
+                      <span className="font-semibold text-blue-600 block">{v.no_rm}</span>
+                      <span className="text-slate-900 font-medium">{v.patient_name}</span>
+                    </td>
+                    <td className="p-4">
+                      <span className="font-semibold text-slate-800 block">{v.poli}</span>
+                      <span className="text-xs text-slate-500">Dr. {v.doctor_name}</span>
+                    </td>
+                    <td className="p-4">
+                      <span className="block">{v.visit_date ? v.visit_date.split('T')[0] : '-'}</span>
+                      <span className="inline-block mt-1 px-2 py-0.5 text-xs bg-slate-100 text-slate-600 rounded-md font-medium">{v.payment_type}</span>
+                    </td>
+                    <td className="p-4 max-w-xs truncate text-slate-600">{v.initial_complaint}</td>
+                    <td className="p-4 text-center">
+                      <select
+                        value={v.status}
+                        onChange={(e) => handleStatusChange(v.id, e.target.value)}
+                        className={`px-3 py-1.5 rounded-xl text-xs font-semibold border focus:ring-2 focus:ring-blue-500 ${
+                          v.status === 'Menunggu' ? 'bg-amber-50 text-amber-700 border-amber-200' :
+                          v.status === 'Check In' ? 'bg-blue-50 text-blue-700 border-blue-200' :
+                          v.status === 'Pemeriksaan' ? 'bg-purple-50 text-purple-700 border-purple-200' :
+                          'bg-emerald-50 text-emerald-700 border-emerald-200'
+                        }`}
+                      >
+                        <option value="Menunggu">Menunggu</option>
+                        <option value="Check In">Check In</option>
+                        <option value="Pemeriksaan">Pemeriksaan</option>
+                        <option value="Selesai">Selesai</option>
+                      </select>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
         </div>
-
       </div>
 
       {/* Modal Form Pendaftaran Kunjungan */}

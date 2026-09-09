@@ -7,6 +7,7 @@ router.use(verifyToken);
 
 // Hanya Dokter (dan Admin untuk monitoring) yang dapat mengakses rekam medis
 router.get('/visit/:visitId', medicalController.getMedicalRecordByVisit);
+router.get('/:patientId', medicalController.getMedicalRecordByPatient);
 router.post('/', authorizeRoles('Dokter', 'Administrator'), medicalController.createMedicalRecord);
 
 module.exports = router;

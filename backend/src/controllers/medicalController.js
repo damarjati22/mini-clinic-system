@@ -22,6 +22,29 @@ exports.getMedicalRecordByVisit = async (req, res) => {
     }
 };
 
+exports.getMedicalRecordByPatient = async (req, res) => {
+    try {
+        const { patientId } = req.params;
+        const [records] = await db.query(
+            `SELECT mr.*, u.name as doctor_name, v.visit_date, v.poli 
+             FROM medical_records mr
+             JOIN users u ON mr.doctor_id = u.id
+             JOIN visits v ON mr.visit_id = v.id
+             WHERE mr.patient_id = ?
+             ORDER BY mr.id DESC`,
+            [patientId]
+        );
+
+        res.status(200).json({
+            success: true,
+            data: records
+        });
+    } catch (error) {
+        console.error('Error getMedicalRecordByPatient:', error);
+        res.status(500).json({ success: false, message: 'Gagal memuat rekam medis pasien.' });
+    }
+};
+
 // Simpan Rekam Medis (SOAP) & Ubah Status Kunjungan jadi 'Selesai'
 exports.createMedicalRecord = async (req, res) => {
     try {

@@ -4,14 +4,15 @@ import DashboardAdmin from './admin/dashboardadmin.jsx';
 import DashboardDokter from './dokter/dashboarddokter.jsx';
 import DashboardPetugas from './petugaspendaftaran/dashboardpetugas.jsx';
 import PatientManagement from './petugaspendaftaran/PatientManagement.jsx';
-import VisitManagement from './petugaspendaftaran/VisitManagement.jsx'; // <-- Tambahkan import ini
+import VisitManagement from './petugaspendaftaran/VisitManagement.jsx';
 import QueueManagement from './petugaspendaftaran/queueManagement.jsx';
+import DashboardLayout from './DashboardLayout.jsx';
 
 function App() {
   const [backendMessage, setBackendMessage] = useState('');
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState(null);
-  const [currentView, setCurrentView] = useState('home');
+  const [currentView, setCurrentView] = useState('dashboard');
 
   useEffect(() => {
     const savedUser = localStorage.getItem('user');
@@ -39,77 +40,69 @@ function App() {
     setCurrentView('home');
   };
 
-  // Navigasi ke Master Data Pasien
-  if (currentView === 'patients' && user) {
-    return (
-      <PatientManagement 
-        onBack={() => setCurrentView('dashboard')} 
-        user={user} 
-      />
-    );
-  }
-
-  // Navigasi ke Modul Pendaftaran Kunjungan (Baru)
-  if (currentView === 'visits' && user) {
-    return (
-      <VisitManagement 
-        onBack={() => setCurrentView('dashboard')} 
-        user={user} 
-      />
-    );
-  }
-
-  if (currentView === 'queue' && user) {
-  return <QueueManagement onBack={() => setCurrentView('dashboard')} user={user} />;
-}
-
-  // Jika belum login
-  if (currentView === 'login' && !user) {
-    return (
-      <Login 
-        onBack={() => setCurrentView('home')} 
-        onLoginSuccess={(userData) => {
-          setUser(userData);
-          setCurrentView('dashboard');
-        }} 
-      />
-    );
-  }
-
-  // Render Dashboard Berdasarkan Role User
-  if (user) {
-    if (user.role === 'Administrator') {
-      return <DashboardAdmin user={user} onLogout={handleLogout} onNavigate={(view) => setCurrentView(view)} />;
+  if (!user || currentView === 'login') {
+    if (currentView === 'login') {
+      return (
+        <Login 
+          onBack={() => setCurrentView('home')} 
+          onLoginSuccess={(userData) => {
+            setUser(userData);
+            setCurrentView('dashboard');
+          }} 
+        />
+      );
     }
-    if (user.role === 'Dokter') {
-      return <DashboardDokter user={user} onLogout={handleLogout} />;
-    }
-    if (user.role === 'Petugas Pendaftaran') {
-      return <DashboardPetugas user={user} onLogout={handleLogout} onNavigate={(view) => setCurrentView(view)} />;
-    }
-  }
 
-  // Tampilan Utama (Home / Cek Server)
-  return (
-    <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center p-6 font-sans">
-      <div className="max-w-md w-full text-center space-y-6">
-        <div>
-          <h1 className="text-3xl font-extrabold text-slate-800 tracking-tight">Mini Clinic System</h1>
-          <p className="text-sm text-slate-500 mt-1">Sistem Informasi Manajemen Klinik Pratama</p>
-        </div>
-        <div className="bg-white p-8 rounded-2xl shadow-xl border border-slate-100 text-left space-y-6">
-          <p className="text-sm font-medium text-emerald-600 bg-emerald-50 p-3 rounded-xl border border-emerald-100">
-            ✅ {backendMessage}
-          </p>
-          <button
-            onClick={() => setCurrentView('login')}
-            className="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-xl shadow-lg transition"
-          >
-            Masuk ke Halaman Login
-          </button>
+    return (
+      <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center p-6 font-sans">
+        <div className="max-w-md w-full text-center space-y-6">
+          <div>
+            <h1 className="text-3xl font-extrabold text-slate-800 tracking-tight">Mini Clinic System</h1>
+            <p className="text-sm text-slate-500 mt-1">Sistem Informasi Manajemen Klinik Pratama</p>
+          </div>
+          <div className="bg-white p-8 rounded-2xl shadow-xl border border-slate-100 text-left space-y-6">
+            <p className="text-sm font-medium text-emerald-600 bg-emerald-50 p-3 rounded-xl border border-emerald-100">
+              ✅ {backendMessage}
+            </p>
+            <button
+              onClick={() => setCurrentView('login')}
+              className="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-xl shadow-lg transition"
+            >
+              Masuk ke Halaman Login
+            </button>
+          </div>
         </div>
       </div>
-    </div>
+    );
+  }
+
+  let content = null;
+
+  if (currentView === 'patients') {
+    content = <PatientManagement user={user} />;
+  } else if (currentView === 'visits') {
+    content = <VisitManagement user={user} />;
+  } else if (currentView === 'queue') {
+    content = <QueueManagement user={user} />;
+  } else {
+    if (user.role === 'Administrator') {
+      content = <DashboardAdmin user={user} onLogout={handleLogout} onNavigate={(view) => setCurrentView(view)} />;
+    } else if (user.role === 'Dokter') {
+      content = <DashboardDokter user={user} onLogout={handleLogout} />;
+    } else if (user.role === 'Petugas Pendaftaran') {
+      content = <DashboardPetugas user={user} onLogout={handleLogout} onNavigate={(view) => setCurrentView(view)} />;
+    }
+  }
+
+  return (
+    <DashboardLayout 
+      user={user} 
+      currentView={currentView} 
+      onNavigate={(view) => setCurrentView(view)} 
+      onLogout={handleLogout}
+    >
+      {content}
+    </DashboardLayout>
   );
 }
 
