@@ -17,6 +17,19 @@ npm install
 cd ../frontend
 npm install
 
+4. env.exammple
+# Server Configuration
+PORT=5000
+
+# Database Configuration
+DB_HOST=localhost
+DB_USER=root
+DB_PASSWORD=
+DB_NAME=mini_clinic_db
+
+# Security Configuration
+JWT_SECRET=masukkan_secret_key_yang_sangat_aman_disini
+
 🗄️ Cara Migrasi Database
 
 1.Buat database baru di MySQL/phpMyAdmin dengan nama mini_clinic_db.
